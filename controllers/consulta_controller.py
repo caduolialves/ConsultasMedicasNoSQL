@@ -1,6 +1,7 @@
 from pymongo.collection import Collection
 from tabulate import tabulate
 from bson import ObjectId
+from utils.selection_utils import selecionar_item
 
 class ConsultaController:
 
@@ -45,12 +46,48 @@ class ConsultaController:
         except Exception as e:
             print(f"Erro ao listar consultas: {e}")
 
-    def atualizar_consulta(self, consulta_id, **updates):
-        try:
-            self.collection.update_one({"_id": consulta_id}, {"$set": updates})
-            print("Consulta atualizada com sucesso!")
-        except Exception as e:
-            print(f"Erro ao atualizar consulta: {e}")
+    def atualizar_consulta(self):
+        while True:
+            try:
+                # Listar consultas para o usuário selecionar
+                print("\n--- Selecionar Consulta para Atualização ---")
+                consultas = self.listar_consultas(return_data=True)
+                consulta_opcoes = [
+                    (consulta[0], f"Médico: {consulta[1]}, Paciente: {consulta[2]}, Data: {consulta[3]}")
+                    for consulta in consultas
+                ]
+                consulta_id = selecionar_item("Selecione a Consulta para Atualizar", consulta_opcoes)
+
+                if not consulta_id:
+                    print("Nenhuma consulta selecionada. Tente novamente.")
+                    return
+
+                # Solicitar os campos para atualização
+                updates = {}
+                data_consulta = input("Nova data (YYYY-MM-DD) (deixe vazio para não alterar): ").strip()
+                hora_consulta = input("Nova hora (HH:MM) (deixe vazio para não alterar): ").strip()
+                status = input("Novo status (deixe vazio para não alterar): ").strip()
+
+                if data_consulta:
+                    updates["data_consulta"] = data_consulta
+                if hora_consulta:
+                    updates["hora_consulta"] = hora_consulta
+                if status:
+                    updates["status"] = status
+
+                # Atualizar no banco
+                self.collection.update_one({"_id": ObjectId(consulta_id)}, {"$set": updates})
+                print("Consulta atualizada com sucesso!")
+
+                # Perguntar se deseja atualizar outra consulta
+                continuar = input("Deseja atualizar outra consulta? (s/n): ").strip().lower()
+                if continuar != 's':
+                    break
+
+            except Exception as e:
+                print(f"Erro ao atualizar consulta: {e}")
+                break
+
 
     def remover_consulta(self, consulta_id):
         try:

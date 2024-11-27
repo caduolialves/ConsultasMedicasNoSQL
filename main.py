@@ -224,49 +224,15 @@ def atualizar_registros(medico_controller, paciente_controller, consulta_control
         choice = input("Escolha uma opção: ")
 
         if choice == '1':
-            while True:
-                medico_controller.listar_medicos()
-                medico_id = input("ID do Médico a ser atualizado: ")
-                nome = input("Novo nome (ou pressione Enter para manter o atual): ")
-                especialidade = input("Nova especialidade (ou pressione Enter para manter a atual): ")
-                telefone = input("Novo telefone (ou pressione Enter para manter o atual): ")
-                medico_controller.atualizar_medico(medico_id, nome=nome, especialidade=especialidade, telefone=telefone)
-
-                continuar = input("Deseja atualizar outro médico? (s/n): ").strip().lower()
-                if continuar != 's':
-                    break
-
+            medico_controller.atualizar_medico()
         elif choice == '2':
-            while True:
-                paciente_controller.listar_pacientes()
-                paciente_id = input("ID do Paciente a ser atualizado: ")
-                nome = input("Novo nome (ou pressione Enter para manter o atual): ")
-                telefone = input("Novo telefone (ou Enter para manter o atual): ")
-                paciente_controller.atualizar_paciente(paciente_id, nome=nome, telefone=telefone)
-
-                continuar = input("Deseja atualizar outro paciente? (s/n): ").strip().lower()
-                if continuar != 's':
-                    break
-
+            paciente_controller.atualizar_paciente()
         elif choice == '3':
-            while True:
-                consulta_controller.listar_consultas()
-                consulta_id = input("ID da Consulta a ser atualizada: ")
-                data_consulta = input("Nova data (YYYY-MM-DD) (ou Enter para manter a atual): ")
-                hora_consulta = input("Nova hora (HH:MM) (ou Enter para manter a atual): ")
-                status = input("Novo status (ou Enter para manter o atual): ")
-                consulta_controller.atualizar_consulta(consulta_id, data_consulta=data_consulta, hora_consulta=hora_consulta, status=status)
-
-                continuar = input("Deseja atualizar outra consulta? (s/n): ").strip().lower()
-                if continuar != 's':
-                    break
-
+            consulta_controller.atualizar_consulta()
         elif choice == '4':
-            # Sai do menu de atualização e retorna ao menu principal
             return
-
         else:
-            print("Opção inválida. Por favor, tente novamente.")
+            print("Opção inválida. Tente novamente.")
 
 def listar_registros(medico_controller, paciente_controller, consulta_controller):
     while True:

@@ -1,7 +1,7 @@
 from pymongo.collection import Collection
 from tabulate import tabulate
 from bson import ObjectId
-
+from utils.selection_utils import selecionar_item
 
 class MedicoController:
     def __init__(self, collection: Collection, consultas_collection: Collection):
@@ -42,12 +42,45 @@ class MedicoController:
         except Exception as e:
             print(f"Erro ao listar médicos: {e}")
 
-    def atualizar_medico(self, medico_id, **updates):
-        try:
-            self.collection.update_one({"_id": medico_id}, {"$set": updates})
-            print("Médico atualizado com sucesso!")
-        except Exception as e:
-            print(f"Erro ao atualizar médico: {e}")
+    def atualizar_medico(self):
+        while True:
+            try:
+                # Listar médicos para o usuário selecionar
+                print("\n--- Selecionar Médico para Atualização ---")
+                medicos = self.listar_medicos(return_data=True)
+                medico_opcoes = [(medico[0], f"{medico[1]} ({medico[2]})") for medico in medicos]
+                medico_id = selecionar_item("Selecione o Médico para Atualizar", medico_opcoes)
+
+                if not medico_id:
+                    print("Nenhum médico selecionado. Tente novamente.")
+                    return
+
+                # Solicitar os campos para atualização
+                updates = {}
+                nome = input("Novo nome (deixe vazio para não alterar): ").strip()
+                especialidade = input("Nova especialidade (deixe vazio para não alterar): ").strip()
+                telefone = input("Novo telefone (deixe vazio para não alterar): ").strip()
+
+                if nome:
+                    updates["nome"] = nome
+                if especialidade:
+                    updates["especialidade"] = especialidade
+                if telefone:
+                    updates["telefone"] = telefone
+
+                # Atualizar no banco
+                self.collection.update_one({"_id": ObjectId(medico_id)}, {"$set": updates})
+                print("Médico atualizado com sucesso!")
+
+                # Perguntar se deseja atualizar outro médico
+                continuar = input("Deseja atualizar outro médico? (s/n): ").strip().lower()
+                if continuar != 's':
+                    break
+
+            except Exception as e:
+                print(f"Erro ao atualizar médico: {e}")
+                break
+
     
     def remover_medico(self, medico_id):
         try:
